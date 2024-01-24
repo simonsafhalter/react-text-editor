@@ -4,6 +4,8 @@ import 'quill/dist/quill.snow.css';
 import { io } from 'socket.io-client';
 import { useParams } from 'react-router-dom';
 
+// Settings for the toolbar
+// More docs for customising: https://quilljs.com/docs/modules/toolbar/
 const TOOLBAR_OPTIONS = [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
     [{ font: [] }],
@@ -21,6 +23,7 @@ export default function TextEditor() {
     const [socket, setSocket] = useState();
     const [quill, setQuill] = useState();
 
+    // Connect to the web socket
     useEffect(() => {
         const s = io('http://localhost:3001')
         setSocket(s);
@@ -40,6 +43,7 @@ export default function TextEditor() {
         socket.emit('get-document', documentId);
     }, [socket, quill, documentId]);
 
+    // Emit send-changes when Quill tells us we changed the document
     useEffect(() => {
         if (socket == null || quill == null) return;
 
@@ -56,6 +60,7 @@ export default function TextEditor() {
         }
     }, [socket, quill]);
 
+    // Receive changes from the server
     useEffect(() => {
         if (socket == null || quill == null) return;
 
@@ -70,6 +75,7 @@ export default function TextEditor() {
         }
     }, [socket, quill]);
 
+    // Initialise and append Quill
     const wrapperRef = useCallback(wrapper => {
         if (wrapper == null) return;
 
@@ -80,6 +86,8 @@ export default function TextEditor() {
             theme: 'snow',
             modules: { toolbar: TOOLBAR_OPTIONS }
         });
+
+        // Disable editing and show a loading message until we load a document
         q.disable();
         q.setText('Loading...');
         setQuill(q);
