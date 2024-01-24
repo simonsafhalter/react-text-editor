@@ -2,20 +2,25 @@ const monfoose = require('mongoose');
 const Document = require('./Document');
 
 mongoose.connect('mongodb://localhost/text-editor', {
-    
+    // Add relevant properties here
 });
 
+// Default initial value when creating a new document from scratch
 const defaultValue = '';
 
+// Socket.io initialisation
 const io = require('socket.io')(3001, {
+    // Allowing requests from the below host and port
     cors: {
         origin: 'http://localhost:3000',
         methods: ['GET', 'POST']
     }
 })
 
+// Listen for a socket connection
 io.on('connection', socket => {
 
+    // Clients want's to get the document by ID
     socket.on('get-document', async documentId => {
         const document = await findOrCreateDocument(documentId);
         socket.join(documentId);
